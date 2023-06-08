@@ -1,0 +1,11 @@
+{
+  "name": "mapgame",
+  "version": "1.0.0",
+  "description": "This is the multiplayer mapgame",
+  "main": "priv.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Talaha Modak",
+  "license": "ISC"
+}
