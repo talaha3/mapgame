@@ -8,9 +8,13 @@ textw = 0;
 butpressed = -1;
 presscheck = false;
 word = '';
+letters = 'qwertyuiopasdfghjklzxcvbnm'.split('')
+let flag;
+
+
 
 function preload(){
-	uk = loadImage('images/uk.webp');
+	flag = loadImage('images/uk.webp');
 }
 
 function setup() {
@@ -20,14 +24,19 @@ function setup() {
 	else{
 		cnv = createCanvas(0.8*windowHeight, 0.9*windowHeight)
 	}
-
 	background(137, 7, 176);
+	textFont('Varela Round')
 	makekeys();
+	drawflag();
+	
+
+	
+	
+
 	// put setup code here
 }
 
 function draw() {
-
 	keyboard();
 	if(presscheck&&frameCount<10){
 		for(k of keys){
@@ -37,11 +46,14 @@ function draw() {
 		}
 		fill(70)
 		rectMode(CENTER);
+		stroke(0);
+		strokeWeight(1);
 		rect(key.x, key.y, key.width, key.height, 5);
 		fill(255)
 		textSize(rectwidth/2)
 		textStyle(BOLD)
 		textAlign(CENTER, CENTER);
+		noStroke();
 		text(key.text, key.x, key.y)
 	}
 	else{
@@ -50,14 +62,14 @@ function draw() {
 
 	
 	
+	
 	// put drawing code here
 }
 
 function makekeys(){
 	rectMode(CENTER);
-	
-
-	
+	stroke(0);
+	strokeWeight(1);
 	textx = 0.4*width;
 	textw = 0.8*width;
 	texth = 0.1*width;
@@ -66,9 +78,6 @@ function makekeys(){
 	fill(255);
 	rect(textx, texty, textw, texth, 3); //text area
 
-	fill(248,235,254);
-	rect(width/2, 15*height/18, width, 5*height/9-1.5*0.11*width); //keyboard background
-	
 	rectwidth = (width-(0.1*width)-(0.02*width))/10;
 	rectheight = (height - 5*height/9-1.5*0.11*width/2-0.05*height)/4
 
@@ -95,7 +104,7 @@ function makekeys(){
 		width: rectwidth, 
 		height: rectheight,
 		fill: 0,
-		text: String.fromCharCode(97+i)
+		text: letters[i]
 	}
 
 		keys.push(key);
@@ -137,6 +146,11 @@ function makekeys(){
 
 function keyboard(){
 	rectMode(CENTER);
+	stroke(0);
+	strokeWeight(1);
+
+	fill(248,235,254);
+	rect(width/2, 15*height/18, width, 5*height/9-1.5*0.11*width); //keyboard background
 	for(key of keys){ //draws keys
 		if(key.fill==2){
 			fill(56, 192, 70)		
@@ -147,7 +161,8 @@ function keyboard(){
 		else{
 				fill(255)
 		}
-	
+		stroke(0);
+		strokeWeight(1);
 		rect(key.x, key.y, key.width, key.height, 5);
 		if(key.fill>0){
 			fill(255);	
@@ -158,6 +173,7 @@ function keyboard(){
 		textSize(rectwidth/2)
 		textStyle(BOLD)
 		textAlign(CENTER, CENTER);
+		noStroke();
 		text(key.text, key.x, key.y)
 	}
 }
@@ -173,7 +189,7 @@ function mousePressed(){
 				butpressed = 'enter'; //space is 27th index
 				presscheck = true;
 				if(output.length>0){
-					word = txt;
+					sendword(txt);
 					output = [];
 				}
 			}
@@ -203,11 +219,14 @@ function mousePressed(){
 	}
 	txt = output.join('');
 	fill(255);
+	stroke(0);
+	strokeWeight(1);
 	rect(textx, texty, textw, texth, 3); //text area
 	fill(0);
 	textSize(rectwidth/2)
 	textStyle(BOLD)
 	textAlign(LEFT, CENTER);
+	noStroke();
 	text(txt, textx-0.95*textw/2, texty);
 }
 
@@ -215,7 +234,7 @@ function keyPressed(){
 	rectMode(CENTER);
 	if(key.length==1&&key.toUpperCase()!=key.toLowerCase()){
 		frameCount = 0;
-		butpressed = key; //gets ascii codes and subtracts 97
+		butpressed = key.toLowerCase(); //gets ascii codes and subtracts 97
 		presscheck = true;
 		if(output.length<22){
 			output.push(key.toLowerCase());
@@ -240,19 +259,54 @@ function keyPressed(){
 		butpressed = 'enter'; //space is 27th index
 		presscheck = true;
 		if(output.length>0){
-			word = txt;
+			sendword(txt);
+			
 			output = [];
 		}
 	}
 
 	txt = output.join('');
 	fill(255);
+	stroke(0);
+	strokeWeight(1);
 	rect(textx, texty, textw, texth, 3); //text area
 	fill(0);
 	textSize(rectwidth/2)
 	textStyle(BOLD)
 	textAlign(LEFT, CENTER);
+	noStroke();
 	text(txt, textx-0.95*textw/2, texty)
 
 
+}
+
+function drawflag(){
+	flagw = flag.width/(flag.width+flag.height)
+	flagh = flag.height/(flag.width+flag.height)
+	imageMode(CENTER);
+	stroke(255);
+	strokeWeight(10);
+	rect(width/2, 2*height/7, width*flagw, width*flagh,4)
+	image(flag, width/2, 2*height/7, width*flagw, width*flagh);
+	fill(255);
+	textAlign(CENTER);
+	textStyle(BOLD);
+	textSize(width/10)
+	noStroke();
+	text('Round 1', width/2, height/10)
+	textStyle(NORMAL);
+}
+
+async function sendword(word){
+	options = {
+		method: 'POST',
+		headers: {
+			'Content-Type':'text/plain'
+		},
+		body: word
+	};
+
+	const response = await fetch('/api', options)
+	const data = await response.json();
+	console.log(data);
 }
